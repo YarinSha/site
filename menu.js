@@ -15,23 +15,29 @@
     firebase.analytics();
     var db = firebase.firestore();
 
-    const txtEmail = document.getElementById("email");
-    const txtName = document.getElementById("name");
-    const txtType = document.getElementById("type");
+    const txtTitle = document.getElementById("title");
+    const btnMeetings = document.getElementById("btnMeetings");
+    const btnClasses = document.getElementById("btnClasses");
+    const btnTeachers = document.getElementById("btnTeachers");
 
     const email = sessionStorage.getItem("EMAIL");
-
-    if(email) {
-        txtEmail.innerHTML = email;
-    }
+    var name, type;
 
     var docRef = db.collection("users").doc(email);
 
     docRef.get().then(function(doc) {
         if (doc.exists) {
             console.log("Document data:", doc.data());
-            txtName.innerHTML = doc.data().name;
-            txtType.innerHTML = doc.data().type;
+            name = doc.data().name;
+            type = doc.data().type;
+            txtTitle.innerHTML = "שלום " + name;
+            if (type === "student") {
+                btnClasses.style.display = "none";
+                btnTeachers.style.display = "none";
+            }
+            if (type === "teacher") {
+                btnTeachers.style.display = "none";
+            }
         } else {
             // doc.data() will be undefined in this case
             console.log("No such document!");
@@ -39,4 +45,6 @@
     }).catch(function(error) {
         console.log("Error getting document:", error);
     });
+
+    
 }());

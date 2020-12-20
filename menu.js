@@ -28,9 +28,15 @@
     docRef.get().then(function(doc) {
         if (doc.exists) {
             console.log("Document data:", doc.data());
+
             name = doc.data().name;
             type = doc.data().type;
+
+            sessionStorage.setItem("NAME", name);
+            sessionStorage.setItem("TYPE", type);
+
             txtTitle.innerHTML = "שלום " + name;
+
             if (type === "student") {
                 btnClasses.style.display = "none";
                 btnTeachers.style.display = "none";
@@ -47,4 +53,7 @@
     });
 
     // TODO onclick listeners
+    btnMeetings.addEventListener("click", e => {
+        location.href = "meetings.html";
+    })
 }());

@@ -32,9 +32,8 @@
             location.href = "menu.html";
           })
           .catch((error) => {
-            var errorCode = error.code;
             var errorMessage = error.message;
-            alert(errorCode, errorMessage);
+            alert(errorMessage);
           });
     })
 }());

@@ -8,7 +8,7 @@
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "https://amit-6b7b6.web.app/",
+            "file": "public/login.html",
             "webRoot": "${workspaceFolder}"
         }
     ]

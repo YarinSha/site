@@ -23,37 +23,63 @@
     const email = sessionStorage.getItem("EMAIL");
     var name, type;
 
-    var docRef = db.collection("users").doc(email);
+    if (sessionStorage.getItem("PREVEMAIL") != null && sessionStorage.getItem("PREVEMAIL") == sessionStorage.getItem("EMAIL")) {
+        name = sessionStorage.getItem("NAME");
+        type = sessionStorage.getItem("TYPE");
 
-    docRef.get().then(function(doc) {
-        if (doc.exists) {
-            console.log("Document data:", doc.data());
+        txtTitle.innerHTML = "שלום " + name;
 
-            name = doc.data().name;
-            type = doc.data().type;
-
-            sessionStorage.setItem("NAME", name);
-            sessionStorage.setItem("TYPE", type);
-
-            txtTitle.innerHTML = "שלום " + name;
-
-            if (type === "student") {
-                btnClasses.style.display = "none";
-                btnTeachers.style.display = "none";
-            }
-            if (type === "teacher") {
-                btnTeachers.style.display = "none";
-            }
-        } else {
-            // doc.data() will be undefined in this case
-            console.log("No such document!");
+        if (type === "student") {
+            btnClasses.style.display = "none";
+            btnTeachers.style.display = "none";
         }
-    }).catch(function(error) {
-        console.log("Error getting document:", error);
-    });
+        if (type === "teacher") {
+            btnTeachers.style.display = "none";
+        }
+    }
+    else {
+        var docRef = db.collection("users").doc(email);
+
+        docRef.get().then(function(doc) {
+            if (doc.exists) {
+                console.log("Document data:", doc.data());
+
+                name = doc.data().name;
+                type = doc.data().type;
+
+                sessionStorage.setItem("NAME", name);
+                sessionStorage.setItem("TYPE", type);
+
+                txtTitle.innerHTML = "שלום " + name;
+
+                if (type === "student") {
+                    btnClasses.style.display = "none";
+                    btnTeachers.style.display = "none";
+                }
+                if (type === "teacher") {
+                    btnTeachers.style.display = "none";
+                }
+            } else {
+                // doc.data() will be undefined in this case
+                console.log("No such document!");
+            }
+        }).catch(function(error) {
+            console.log("Error getting document:", error);
+        });
+
+        sessionStorage.setItem("PREVEMAIL", email);
+    }
 
     // TODO onclick listeners
     btnMeetings.addEventListener("click", e => {
         location.href = "meetings.html";
-    })
+    });
+
+    btnClasses.addEventListener("click", e => {
+        location.href = "classes.html";
+    });
+
+    btnTeachers.addEventListener("click", e => {
+        location.href = "404.html";
+    });
 }());

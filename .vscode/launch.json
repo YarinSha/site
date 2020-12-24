@@ -7,8 +7,9 @@
         {
             "type": "pwa-chrome",
             "request": "launch",
-            "name": "Open login.html",
-            "file": "c:\\Users\\HP\\Desktop\\site\\login.html"
+            "name": "Launch Chrome against localhost",
+            "file": "public/login.html",
+            "webRoot": "${workspaceFolder}"
         }
     ]
 }

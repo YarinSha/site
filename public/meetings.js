@@ -16,6 +16,8 @@
     var storage = firebase.storage();
     var storageRef = storage.ref();
 
+    const table = document.getElementById("table");
+
     const name = sessionStorage.getItem("NAME");
     const type = sessionStorage.getItem("TYPE");
     console.log(name, type);
@@ -29,7 +31,7 @@
             res.items.forEach(function (itemRef) {
                 // All the items under listRef.
                 if (itemRef.name.includes(name) || type === "admin") {
-                    downloadFile(itemRef);
+                    downloadFile(itemRef, type);
                 }
             });
         })
@@ -39,10 +41,37 @@
         });
 }());
 
-function downloadFile(file) {
+function downloadFile(file, type) {
     file.getDownloadURL()
         .then(function (url) {
-            // TODO download file with url
+            var xhr = new XMLHttpRequest();
+            xhr.responseType = 'blob';
+            xhr.onload = function(event) {
+                var blob = xhr.response;
+                blob.text().then(t => {
+                    console.log(t);
+                    if (type === "student") {
+                        var txtName = document.createTextNode(t.split("&&")[1]);
+                    }
+                    if (type === "teacher") {
+                        var txtName = document.createTextNode(t.split("&&")[0]);
+                    }
+                    if (type === "admin") {
+                        var txtName = document.createTextNode(t.split("&&")[0] + " - " + t.split("&&")[1]);
+                    }
+
+                    let txtDate = document.createTextNode(t.split("&&")[2]);
+                    let txtTime = document.createTextNode(t.split("&&")[3]);
+
+                    var row = table.insertRow();
+
+                    row.insertCell().appendChild(txtName);
+                    row.insertCell().appendChild(txtDate);
+                    row.insertCell().appendChild(txtTime);
+                })
+            };
+            xhr.open('GET', url);
+            xhr.send();
         })
         .catch(function (error) {
             // Handle any errors

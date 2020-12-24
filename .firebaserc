@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "amit-6b7b6"
+    "default": "amit-6b7b6",
+    "staging": "amit-6b7b6"
   }
 }

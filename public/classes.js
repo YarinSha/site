@@ -37,7 +37,12 @@ function downloadFile(file) {
     
                     for (i = 0; i < t.split("&&").length - 1; i++) {
                         let txtName = document.createTextNode(t.split("&&")[i]);
-                        table.insertRow().insertCell().appendChild(txtName);
+                        var row = table.insertRow();
+                        row.insertCell().appendChild(txtName);
+                        row.onclick = function(){
+                            sessionStorage.setItem("CLASS", txtName.nodeValue);
+                            location.href = "class.html";
+                        };
                     }
                 })
             };

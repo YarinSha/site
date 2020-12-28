@@ -80,6 +80,6 @@
     });
 
     btnTeachers.addEventListener("click", e => {
-        location.href = "404.html";
+        location.href = "teachers.html";
     });
 }());

@@ -1,4 +1,4 @@
-(function() {
+(function () {
     // Your web app's Firebase configuration
     // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     var firebaseConfig = {
@@ -20,6 +20,10 @@
     const btnClasses = document.getElementById("btnClasses");
     const btnTeachers = document.getElementById("btnTeachers");
 
+    btnMeetings.style.display = "none";
+    btnClasses.style.display = "none";
+    btnTeachers.style.display = "none";
+
     const email = sessionStorage.getItem("EMAIL");
     var name, type;
 
@@ -30,17 +34,22 @@
         txtTitle.innerHTML = "שלום " + name;
 
         if (type === "student") {
-            btnClasses.style.display = "none";
-            btnTeachers.style.display = "none";
+            btnMeetings.style.display = "block";
         }
         if (type === "teacher") {
-            btnTeachers.style.display = "none";
+            btnMeetings.style.display = "block";
+            btnClasses.style.display = "block";
+        }
+        if (type === "admin") {
+            btnMeetings.style.display = "block";
+            btnClasses.style.display = "block";
+            btnTeachers.style.display = "block";
         }
     }
     else {
         var docRef = db.collection("users").doc(email);
 
-        docRef.get().then(function(doc) {
+        docRef.get().then(function (doc) {
             if (doc.exists) {
                 console.log("Document data:", doc.data());
 
@@ -53,24 +62,28 @@
                 txtTitle.innerHTML = "שלום " + name;
 
                 if (type === "student") {
-                    btnClasses.style.display = "none";
-                    btnTeachers.style.display = "none";
+                    btnMeetings.style.display = "block";
                 }
                 if (type === "teacher") {
-                    btnTeachers.style.display = "none";
+                    btnMeetings.style.display = "block";
+                    btnClasses.style.display = "block";
+                }
+                if (type === "admin") {
+                    btnMeetings.style.display = "block";
+                    btnClasses.style.display = "block";
+                    btnTeachers.style.display = "block";
                 }
             } else {
                 // doc.data() will be undefined in this case
                 console.log("No such document!");
             }
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.log("Error getting document:", error);
         });
 
         sessionStorage.setItem("PREVEMAIL", email);
     }
 
-    // TODO onclick listeners
     btnMeetings.addEventListener("click", e => {
         location.href = "meetings.html";
     });

@@ -68,6 +68,10 @@ function downloadFile(file, type) {
                     row.insertCell().appendChild(txtName);
                     row.insertCell().appendChild(txtDate);
                     row.insertCell().appendChild(txtTime);
+                    row.onclick = function(){
+                        sessionStorage.setItem("MEETING", t);
+                        location.href = "meeting.html";
+                    };
                 })
             };
             xhr.open('GET', url);

@@ -16,13 +16,14 @@
     var storage = firebase.storage();
     var storageRef = storage.ref();
 
-    const table = document.getElementById("table");
+    const tableUpcoming = document.getElementById("tableUpcoming");
+    const tableDone = document.getElementById("tableDone");
 
     const name = sessionStorage.getItem("NAME");
     const type = sessionStorage.getItem("TYPE");
     console.log(name, type);
 
-    storageRef.child("Meetings").listAll()
+    storageRef.child("Meetings/Upcoming").listAll()
         .then(function (res) {
             res.prefixes.forEach(function (folderRef) {
                 // All the prefixes under listRef.
@@ -31,7 +32,39 @@
             res.items.forEach(function (itemRef) {
                 // All the items under listRef.
                 if (itemRef.name.includes(name) || type === "admin") {
-                    downloadFile(itemRef, type);
+                    txtName = document.createTextNode(itemRef.name.split(".")[0]);
+                    var row = tableUpcoming.insertRow();
+                    row.insertCell().appendChild(txtName);
+                    row.onclick = function () {
+                        sessionStorage.setItem("MEETING", itemRef.name);
+                        sessionStorage.setItem("U/D", "U");
+                        location.href = "meeting.html";
+                    };
+                }
+            });
+        })
+        .catch(function (error) {
+            // Uh-oh, an error occurred!
+            console.log(error);
+        });
+
+    storageRef.child("Meetings/Done").listAll()
+        .then(function (res) {
+            res.prefixes.forEach(function (folderRef) {
+                // All the prefixes under listRef.
+                // You may call listAll() recursively on them.
+            });
+            res.items.forEach(function (itemRef) {
+                // All the items under listRef.
+                if (itemRef.name.includes(name) || type === "admin") {
+                    txtName = document.createTextNode(itemRef.name.split(".")[0]);
+                    var row = tableDone.insertRow();
+                    row.insertCell().appendChild(txtName);
+                    row.onclick = function () {
+                        sessionStorage.setItem("MEETING", itemRef.name);
+                        sessionStorage.setItem("U/D", "D");
+                        location.href = "meeting.html";
+                    };
                 }
             });
         })
@@ -40,45 +73,3 @@
             console.log(error);
         });
 }());
-
-function downloadFile(file, type) {
-    file.getDownloadURL()
-        .then(function (url) {
-            var xhr = new XMLHttpRequest();
-            xhr.responseType = 'blob';
-            xhr.onload = function(event) {
-                var blob = xhr.response;
-                blob.text().then(t => {
-                    console.log(t);
-                    if (type === "student") {
-                        var txtName = document.createTextNode(t.split("&&")[1]);
-                    }
-                    if (type === "teacher") {
-                        var txtName = document.createTextNode(t.split("&&")[0]);
-                    }
-                    if (type === "admin") {
-                        var txtName = document.createTextNode(t.split("&&")[0] + " - " + t.split("&&")[1]);
-                    }
-
-                    let txtDate = document.createTextNode(t.split("&&")[2]);
-                    let txtTime = document.createTextNode(t.split("&&")[3]);
-
-                    var row = table.insertRow();
-
-                    row.insertCell().appendChild(txtName);
-                    row.insertCell().appendChild(txtDate);
-                    row.insertCell().appendChild(txtTime);
-                    row.onclick = function(){
-                        sessionStorage.setItem("MEETING", t);
-                        location.href = "meeting.html";
-                    };
-                })
-            };
-            xhr.open('GET', url);
-            xhr.send();
-        })
-        .catch(function (error) {
-            // Handle any errors
-            console.log(error);
-        });
-}

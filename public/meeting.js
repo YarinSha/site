@@ -17,41 +17,150 @@
     var storageRef = storage.ref();
 
     const title = document.getElementById("title");
-    const student = document.getElementById("student");
-    const teacher = document.getElementById("teacher");
-    const admin = document.getElementById("admin");
+    const div = document.getElementById("div");
 
     const name = sessionStorage.getItem("NAME");
     const type = sessionStorage.getItem("TYPE");
     console.log(name, type);
 
-    const meeting = sessionStorage.getItem("MEETING");
+    const meetingName = sessionStorage.getItem("MEETING");
+    const UD = sessionStorage.getItem("U/D");
 
-    if (type === "student") {
+    title.innerHTML = meetingName.split(".")[0];
 
+    if (UD === "U") {
+        storageRef.child("Meetings/Upcoming/" + meetingName).getDownloadURL()
+            .then(function (url) {
+                var xhr = new XMLHttpRequest();
+                xhr.responseType = 'blob';
+                xhr.onload = function (event) {
+                    var blob = xhr.response;
+                    blob.text().then(t => {
+                        console.log(t);
+                        if (type === "student") {
+                            let titleTxt = document.createElement("h3");
+                            titleTxt.innerHTML = "אנא מלא משוב על הפגישה:";
+                            let subTxt = document.createElement("p");
+                            subTxt.innerHTML = "במידה ואתה לא מעוניין נא לשלוח ריק.";
+                            div.appendChild(titleTxt);
+                            div.appendChild(subTxt);
+
+                            var input = document.createElement("textarea");
+                            input.cols = 40;
+                            input.rows = 10;
+                            div.appendChild(input);
+
+                            div.appendChild(document.createElement("br"));
+                            div.appendChild(document.createElement("br"));
+
+                            var btn = document.createElement("button");
+                            btn.innerHTML = "שליחה";
+                            div.appendChild(btn);
+
+                            btn.onclick = function () {
+                                console.log(input.value);
+                                var arr = t.split("&&");
+                                var txt = arr[0] + "&&" + arr[1] + "&&" + arr[2] + "&&" + arr[3] + "&&"
+                                    + input.value + "&&" + arr[5] + "&&";
+                                var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+                                storageRef.child('Meetings/Upcoming/' + meetingName).put(blob);
+                                titleTxt.innerHTML = "המשוב הוזן בהצלחה!"
+                                subTxt.style.display = "none";
+                                input.style.display = "none";
+                                btn.style.display = "none";
+                            }
+                        }
+                        if (type === "teacher") {
+                            let titleTxt = document.createElement("h3");
+                            titleTxt.innerHTML = "אנא מלא משוב על הפגישה:";
+                            div.appendChild(titleTxt);
+
+                            var input = document.createElement("textarea");
+                            input.cols = 40;
+                            input.rows = 10;
+                            div.appendChild(input);
+
+                            div.appendChild(document.createElement("br"));
+                            div.appendChild(document.createElement("br"));
+
+                            var btn = document.createElement("button");
+                            btn.innerHTML = "שליחה";
+                            div.appendChild(btn);
+
+                            btn.onclick = function () {
+                                console.log(input.value);
+                                var arr = t.split("&&");
+                                var txt = arr[0] + "&&" + arr[1] + "&&" + arr[2] + "&&" + arr[3] + "&&"
+                                    + arr[4] + "&&" + input.value + "&&";
+                                var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+                                storageRef.child('Meetings/Upcoming/' + meetingName).put(blob);
+                                titleTxt.innerHTML = "המשוב הוזן בהצלחה!"
+                                input.style.display = "none";
+                                btn.style.display = "none";
+                            }
+                        }
+                        if (type === "admin") {
+                            let txt = document.createElement("h3");
+                            txt.innerHTML = "הפגישה עוד לא נעשתה";
+
+                            div.appendChild(document.createTextNode(t.split("&&")[2] + " - " + t.split("&&")[3]));
+                            div.appendChild(document.createElement("br"));
+                            div.appendChild(txt);
+                        }
+                    })
+                };
+                xhr.open('GET', url);
+                xhr.send();
+            })
+            .catch(function (error) {
+                // Handle any errors
+                console.log(error);
+            });
     }
-    if (type === "teacher") {
-        
-    }
-    if (type === "admin") {
-        title.innerHTML = meeting.split("&&")[0] + " - " + meeting.split("&&")[1];
+    if (UD === "D") {
+        storageRef.child("Meetings/Done/" + meetingName).getDownloadURL()
+            .then(function (url) {
+                var xhr = new XMLHttpRequest();
+                xhr.responseType = 'blob';
+                xhr.onload = function (event) {
+                    var blob = xhr.response;
+                    blob.text().then(t => {
+                        console.log(t);
+                        if (type === "student" || type === "teacher") {
+                            let txt = document.createElement("h3");
+                            txt.innerHTML = "הפגישה נעשתה";
 
-        let txtS = document.createElement("h3");
-        txtS.innerHTML = "משוב תלמיד";
-        txtS.style.margin = 0;
+                            div.appendChild(document.createTextNode(t.split("&&")[2] + " - " + t.split("&&")[3]));
+                            div.appendChild(document.createElement("br"));
+                            div.appendChild(txt);
+                        }
+                        if (type === "admin") {
+                            let txtS = document.createElement("h3");
+                            txtS.innerHTML = "משוב תלמיד";
+                            txtS.style.margin = 0;
 
-        let txtT = document.createElement("h3");
-        txtT.innerHTML = "משוב מורה";
-        txtT.style.margin = 0;
+                            let txtT = document.createElement("h3");
+                            txtT.innerHTML = "משוב מורה";
+                            txtT.style.margin = 0;
 
-        admin.appendChild(document.createTextNode(meeting.split("&&")[2] + " - " + meeting.split("&&")[3]));
-        admin.appendChild(document.createElement("br"));
-        admin.appendChild(document.createElement("br"));
-        admin.appendChild(txtS);
-        admin.appendChild(document.createTextNode(meeting.split("&&")[4]));
-        admin.appendChild(document.createElement("br"));
-        admin.appendChild(document.createElement("br"));
-        admin.appendChild(txtT);
-        admin.appendChild(document.createTextNode(meeting.split("&&")[5]));
+                            div.appendChild(document.createTextNode(t.split("&&")[2] + " - " + t.split("&&")[3]));
+                            div.appendChild(document.createElement("br"));
+                            div.appendChild(document.createElement("br"));
+                            div.appendChild(txtS);
+                            div.appendChild(document.createTextNode(t.split("&&")[4]));
+                            div.appendChild(document.createElement("br"));
+                            div.appendChild(document.createElement("br"));
+                            div.appendChild(txtT);
+                            div.appendChild(document.createTextNode(t.split("&&")[5]));
+                        }
+                    })
+                };
+                xhr.open('GET', url);
+                xhr.send();
+            })
+            .catch(function (error) {
+                // Handle any errors
+                console.log(error);
+            });
     }
 }());

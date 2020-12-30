@@ -37,7 +37,7 @@
             res.items.forEach(function (itemRef) {
                 // All the items under listRef.
                 if (itemRef.name.includes(className)) {
-                    downloadFile(itemRef);
+                    downloadFile(itemRef, table);
                 }
             });
         })
@@ -47,7 +47,7 @@
         });
 }());
 
-function downloadFile(file) {
+function downloadFile(file, table) {
     file.getDownloadURL()
         .then(function (url) {
             var xhr = new XMLHttpRequest();
@@ -63,6 +63,10 @@ function downloadFile(file) {
                         var row = table.insertRow();
                         row.insertCell().appendChild(txtName);
                         row.insertCell().appendChild(txtMeetings);
+                        row.onclick = function () {
+                            sessionStorage.setItem("OF", txtName.nodeValue);
+                            location.href = "student.html";
+                        };
                     }
                 })
             };

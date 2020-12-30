@@ -27,6 +27,7 @@
 
     title.innerHTML = of;
 
+    // TODO if meetingNum = 2 or there is a meeting with this teacher
     if (type === "teacher") {
         var btn = document.createElement("button");
         btn.innerHTML = "קביעת פגישה";
@@ -109,6 +110,7 @@ function newMeeting (student, teacher, storageRef, btn) {
             console.log(txt);
             var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
             storageRef.child('Meetings/Upcoming/' + student + " - " + teacher + ".txt").put(blob);
+            // TODO send an email
             inputTxt.innerHTML = "הפגישה נקבעה בהצלחה!";
             input.style.display = "none";
             btnSub.style.display = "none";

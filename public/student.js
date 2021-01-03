@@ -51,7 +51,7 @@
         btn.onclick = function () {
             newMeeting(of, name, storageRef, btn, className);
         };
-        document.body.appendChild(btn);
+        setTimeout(() => { document.body.appendChild(btn) }, 2000);
     }
 
     storageRef.child("Meetings/Upcoming").listAll()
@@ -127,18 +127,21 @@ function newMeeting(student, teacher, storageRef, btn, className) {
     btnSub.innerHTML = "קביעה";
     btnSub.onclick = function () {
         if (input.value) {
+            var loadTxt = document.createElement("h4");
+            loadTxt.innerHTML = "יוצר את הפגישה... נא לא לצאת מהמסך!";
+            document.body.appendChild(loadTxt);
+
             var txt = student + "&&" + teacher + "&&" + input.value.split("T")[0].split("-")[2] +
                 "/" + input.value.split("T")[0].split("-")[1] + "/" + input.value.split("T")[0].split("-")[0] +
                 "&&" + input.value.split("T")[1] + "&&&&&&";
             console.log(txt);
             var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
-            storageRef.child('Meetings/Upcoming/' + student + " - " + teacher + ".txt").put(blob);
-            // TODO send an email
-            updateMeetings(storageRef, className);
-            inputTxt.innerHTML = "הפגישה נקבעה בהצלחה!";
-            input.style.display = "none";
-            btnSub.style.display = "none";
-            btn.style.display = "none";
+            storageRef.child('Meetings/Upcoming/' + student + "&" + teacher + ".txt").put(blob)
+                .then(function (snapshot) {
+                    console.log('Uploaded a blob or file! ' + student + "&" + teacher);
+                    // TODO send an email
+                    updateMeetings(storageRef, className, inputTxt, input, btnSub, btn, loadTxt);
+                });
         }
         else {
             alert("לא בחרת זמן לפגישה!");
@@ -147,7 +150,8 @@ function newMeeting(student, teacher, storageRef, btn, className) {
     document.body.appendChild(btnSub);
 }
 
-function updateMeetings(storageRef, className) {
+function updateMeetings(storageRef, className, inputTxt, input, btnSub, btn, loadTxt) {
+    var n = 0;
     storageRef.child("Classes").listAll()
         .then(function (res) {
             res.items.forEach(function (classRef) {
@@ -181,10 +185,21 @@ function updateMeetings(storageRef, className) {
                                                                 });
                                                                 if (folderRef.name === "Upcoming") {
                                                                     classTxt = classTxt.concat(sName + "==" + num + "&&");
-                                                                }
-                                                                if (classTxt.length === t.length) {
-                                                                    var blob = new Blob([classTxt], { type: "text/plain;charset=utf-8" });
-                                                                    storageRef.child(classRef.fullPath).put(blob);
+                                                                    if (classTxt.length === t.length) {
+                                                                        var blob = new Blob([classTxt], { type: "text/plain;charset=utf-8" });
+                                                                        storageRef.child(classRef.fullPath).put(blob)
+                                                                            .then(function (snapshot) {
+                                                                                console.log('Uploaded a blob or file! ' + classRef.name);
+                                                                                n++;
+                                                                                if (n == 2) {
+                                                                                    inputTxt.innerHTML = "הפגישה נקבעה בהצלחה!";
+                                                                                    input.style.display = "none";
+                                                                                    btnSub.style.display = "none";
+                                                                                    btn.style.display = "none";
+                                                                                    loadTxt.style.display = "none";
+                                                                                }
+                                                                            });
+                                                                    }
                                                                 }
                                                             })
                                                             .catch(function (error) {

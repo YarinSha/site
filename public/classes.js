@@ -22,35 +22,27 @@
     const type = sessionStorage.getItem("TYPE");
     console.log(name, type);
 
-    downloadFile(storageRef.child("Classes/Classes.txt"));
-}());
-
-function downloadFile(file) {
-    file.getDownloadURL()
-        .then(function (url) {
-            var xhr = new XMLHttpRequest();
-            xhr.responseType = 'blob';
-            xhr.onload = function(event) {
-                var blob = xhr.response;
-                blob.text().then(t => {
-                    console.log(t);
-    
-                    for (i = 0; i < t.split("&&").length - 1; i++) {
-                        let txtName = document.createTextNode(t.split("&&")[i]);
+    storageRef.child("Classes").listAll()
+        .then(function (res) {
+            res.prefixes.forEach(function (folderRef) {
+                // All the prefixes under listRef.
+                // You may call listAll() recursively on them.
+            });
+            res.items.forEach(function (itemRef) {
+                // All the items under listRef.
+                if (itemRef.name !== "Teachers.txt") {
+                    let txtName = document.createTextNode(itemRef.name.split(".")[0]);
                         var row = table.insertRow();
                         row.insertCell().appendChild(txtName);
                         row.onclick = function(){
-                            sessionStorage.setItem("CLASS", txtName.nodeValue);
+                            sessionStorage.setItem("CLASS", itemRef.name.split(".")[0]);
                             location.href = "class.html";
                         };
-                    }
-                })
-            };
-            xhr.open('GET', url);
-            xhr.send();
+                }
+            });
         })
         .catch(function (error) {
-            // Handle any errors
+            // Uh-oh, an error occurred!
             console.log(error);
         });
-}
+}());

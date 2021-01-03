@@ -26,7 +26,7 @@
     const meetingName = sessionStorage.getItem("MEETING");
     const UD = sessionStorage.getItem("U/D");
 
-    title.innerHTML = meetingName.split(".")[0];
+    title.innerHTML = meetingName.split(".")[0].replace("&", " - ");
 
     if (UD === "U") {
         storageRef.child("Meetings/Upcoming/" + meetingName).getDownloadURL()
@@ -45,6 +45,10 @@
                             div.appendChild(txt);
                         }
                         if (type === "teacher") {
+                            div.appendChild(document.createTextNode(t.split("&&")[2] + " - " + t.split("&&")[3]));
+                            
+                            div.appendChild(document.createElement("br"));
+
                             let titleTxt = document.createElement("h3");
                             titleTxt.innerHTML = "אנא שלח כשהפגישה בוצעה וצרף משוב:";
                             div.appendChild(titleTxt);
@@ -93,6 +97,10 @@
                     var blob = xhr.response;
                     blob.text().then(t => {
                         if (type === "student") {
+                            div.appendChild(document.createTextNode(t.split("&&")[2] + " - " + t.split("&&")[3]));
+                            
+                            div.appendChild(document.createElement("br"));
+
                             let titleTxt = document.createElement("h3");
                             titleTxt.innerHTML = "אנא מלא משוב על הפגישה:";
                             let subTxt = document.createElement("p");

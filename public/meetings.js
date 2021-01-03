@@ -32,7 +32,7 @@
             res.items.forEach(function (itemRef) {
                 // All the items under listRef.
                 if (itemRef.name.includes(name) || type === "admin") {
-                    txtName = document.createTextNode(itemRef.name.split(".")[0]);
+                    txtName = document.createTextNode(itemRef.name.split(".")[0].replace("&", " - "));
                     var row = tableUpcoming.insertRow();
                     row.insertCell().appendChild(txtName);
                     row.onclick = function () {
@@ -57,7 +57,7 @@
             res.items.forEach(function (itemRef) {
                 // All the items under listRef.
                 if (itemRef.name.includes(name) || type === "admin") {
-                    txtName = document.createTextNode(itemRef.name.split(".")[0]);
+                    txtName = document.createTextNode(itemRef.name.split(".")[0].replace("&", " - "));
                     var row = tableDone.insertRow();
                     row.insertCell().appendChild(txtName);
                     row.onclick = function () {

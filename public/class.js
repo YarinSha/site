@@ -65,10 +65,11 @@ function downloadFile(file, table) {
                         row.insertCell().appendChild(txtMeetings);
                         row.onclick = function () {
                             sessionStorage.setItem("OF", txtName.nodeValue);
+                            sessionStorage.setItem("NUM", txtMeetings.nodeValue);
                             location.href = "student.html";
                         };
                     }
-                })
+                });
             };
             xhr.open('GET', url);
             xhr.send();

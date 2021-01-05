@@ -41,6 +41,11 @@ function downloadFile(file) {
                         var row = table.insertRow();
                         row.insertCell().appendChild(txtName);
                         row.insertCell().appendChild(txtMeetings);
+                        row.onclick = function() {
+                            sessionStorage.setItem("OF", txtName.nodeValue);
+                            sessionStorage.setItem("NUM", txtMeetings.nodeValue);
+                            location.href = "student.html";
+                        };
                     }
                 })
             };

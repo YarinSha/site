@@ -65,7 +65,7 @@ function downloadFile(file, table) {
                         row.insertCell().appendChild(txtMeetings);
                         row.onclick = function () {
                             sessionStorage.setItem("OF", txtName.nodeValue);
-                            sessionStorage.setItem("NUM", txtMeetings.nodeValue);
+                            sessionStorage.setItem("NUM", txtMeetings.nodeValue.split("/")[0]);
                             location.href = "student.html";
                         };
                     }

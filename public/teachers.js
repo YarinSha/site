@@ -19,7 +19,6 @@ const table = document.getElementById("table");
 
 const name = sessionStorage.getItem("NAME");
 const type = sessionStorage.getItem("TYPE");
-console.log(name, type);
 
 downloadFile(storageRef.child("Classes/Teachers.txt"));
 
@@ -31,8 +30,6 @@ function downloadFile(file) {
             xhr.onload = function (event) {
                 var blob = xhr.response;
                 blob.text().then(t => {
-                    console.log(t);
-
                     for (i = 0; i < t.split("&&").length - 1; i++) {
                         let txtName = document.createTextNode(t.split("&&")[i].split("==")[0]);
                         let txtMeetings = document.createTextNode(t.split("&&")[i].split("==")[1]);
@@ -42,7 +39,7 @@ function downloadFile(file) {
                         row.onclick = function () {
                             sessionStorage.setItem("OF", txtName.nodeValue);
                             sessionStorage.setItem("NUM", txtMeetings.nodeValue);
-                            location.href = "student.html";
+                            location.href = "info.html";
                         };
                     }
                 })

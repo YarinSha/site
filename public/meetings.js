@@ -17,10 +17,10 @@ var storageRef = storage.ref();
 
 const tableUpcoming = document.getElementById("tableUpcoming");
 const tableDone = document.getElementById("tableDone");
+const tableFinished = document.getElementById("tableFinished");
 
 const name = sessionStorage.getItem("NAME");
 const type = sessionStorage.getItem("TYPE");
-console.log(name, type);
 
 storageRef.child("Meetings/Upcoming").listAll()
     .then(function (res) {
@@ -36,7 +36,7 @@ storageRef.child("Meetings/Upcoming").listAll()
                 row.insertCell().appendChild(txtName);
                 row.onclick = function () {
                     sessionStorage.setItem("MEETING", itemRef.name);
-                    sessionStorage.setItem("U/D", "U");
+                    sessionStorage.setItem("U/D/F", "U");
                     location.href = "meeting.html";
                 };
             }
@@ -61,7 +61,32 @@ storageRef.child("Meetings/Done").listAll()
                 row.insertCell().appendChild(txtName);
                 row.onclick = function () {
                     sessionStorage.setItem("MEETING", itemRef.name);
-                    sessionStorage.setItem("U/D", "D");
+                    sessionStorage.setItem("U/D/F", "D");
+                    location.href = "meeting.html";
+                };
+            }
+        });
+    })
+    .catch(function (error) {
+        // Uh-oh, an error occurred!
+        console.log(error);
+    });
+
+storageRef.child("Meetings/Finished").listAll()
+    .then(function (res) {
+        res.prefixes.forEach(function (folderRef) {
+            // All the prefixes under listRef.
+            // You may call listAll() recursively on them.
+        });
+        res.items.forEach(function (itemRef) {
+            // All the items under listRef.
+            if (itemRef.name.includes(name) || type === "admin") {
+                txtName = document.createTextNode(itemRef.name.split(".")[0].replace("&", " - "));
+                var row = tableFinished.insertRow();
+                row.insertCell().appendChild(txtName);
+                row.onclick = function () {
+                    sessionStorage.setItem("MEETING", itemRef.name);
+                    sessionStorage.setItem("U/D/F", "F");
                     location.href = "meeting.html";
                 };
             }

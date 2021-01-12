@@ -22,7 +22,6 @@ const table = document.getElementById("table");
 const name = sessionStorage.getItem("NAME");
 const type = sessionStorage.getItem("TYPE");
 const className = sessionStorage.getItem("CLASS");
-console.log(name, type, className);
 
 pageTitle.innerHTML = className;
 title.innerHTML = className;
@@ -35,7 +34,7 @@ storageRef.child("Classes").listAll()
         });
         res.items.forEach(function (itemRef) {
             // All the items under listRef.
-            if (itemRef.name.includes(className)) {
+            if (itemRef.name.includes(className) || (className === "מורים" && itemRef.name.includes("Teachers"))) {
                 downloadFile(itemRef, table);
             }
         });
@@ -53,18 +52,24 @@ function downloadFile(file, table) {
             xhr.onload = function (event) {
                 var blob = xhr.response;
                 blob.text().then(t => {
-                    console.log(t);
-
                     for (i = 0; i < t.split("&&").length - 1; i++) {
                         let txtName = document.createTextNode(t.split("&&")[i].split("==")[0]);
-                        let txtMeetings = document.createTextNode(t.split("&&")[i].split("==")[1] + "/2");
+                        if (className === "מורים") {
+                            var txtMeetings = document.createTextNode(t.split("&&")[i].split("==")[1]);
+                        }
+                        else {
+                            var txtMeetings = document.createTextNode(t.split("&&")[i].split("==")[1] + "/2");
+                        }
                         var row = table.insertRow();
                         row.insertCell().appendChild(txtName);
                         row.insertCell().appendChild(txtMeetings);
+                        if (txtMeetings.nodeValue === "2/2") {
+                            row.style.color = "DarkSlateGray";
+                        }
                         row.onclick = function () {
                             sessionStorage.setItem("OF", txtName.nodeValue);
                             sessionStorage.setItem("NUM", txtMeetings.nodeValue.split("/")[0]);
-                            location.href = "student.html";
+                            location.href = "info.html";
                         };
                     }
                 });

@@ -19,7 +19,6 @@ const table = document.getElementById("table");
 
 const name = sessionStorage.getItem("NAME");
 const type = sessionStorage.getItem("TYPE");
-console.log(name, type);
 
 storageRef.child("Classes").listAll()
     .then(function (res) {

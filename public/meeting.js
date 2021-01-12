@@ -20,14 +20,13 @@ const div = document.getElementById("div");
 
 const name = sessionStorage.getItem("NAME");
 const type = sessionStorage.getItem("TYPE");
-console.log(name, type);
 
 const meetingName = sessionStorage.getItem("MEETING");
-const UD = sessionStorage.getItem("U/D");
+const UDF = sessionStorage.getItem("U/D/F");
 
 title.innerHTML = meetingName.split(".")[0].replace("&", " - ");
 
-if (UD === "U") {
+if (UDF === "U") {
     storageRef.child("Meetings/Upcoming/" + meetingName).getDownloadURL()
         .then(function (url) {
             var xhr = new XMLHttpRequest();
@@ -65,16 +64,24 @@ if (UD === "U") {
                         div.appendChild(btn);
 
                         btn.onclick = function () {
-                            console.log(input.value);
+                            var loadTxt = document.createElement("h4");
+                            loadTxt.innerHTML = "יוצר את הפגישה... נא לא לצאת מהמסך!";
+                            document.body.appendChild(loadTxt);
+
                             var arr = t.split("&&");
                             var txt = arr[0] + "&&" + arr[1] + "&&" + arr[2] + "&&" + arr[3] + "&&"
                                 + arr[4] + "&&" + input.value + "&&";
                             var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
-                            storageRef.child('Meetings/Done/' + meetingName).put(blob);
-                            storageRef.child("Meetings/Upcoming/" + meetingName).delete();
-                            titleTxt.innerHTML = "המשוב הוזן בהצלחה!"
-                            input.style.display = "none";
-                            btn.style.display = "none";
+                            storageRef.child('Meetings/Done/' + meetingName).put(blob)
+                                .then(function () {
+                                    storageRef.child("Meetings/Upcoming/" + meetingName).delete()
+                                        .then(function () {
+                                            titleTxt.innerHTML = "המשוב הוזן בהצלחה!"
+                                            input.style.display = "none";
+                                            btn.style.display = "none";
+                                            loadTxt.style.display = "none";
+                                        });
+                                });
                         }
                     }
                 })
@@ -87,7 +94,7 @@ if (UD === "U") {
             console.log(error);
         });
 }
-if (UD === "D") {
+if (UDF === "D") {
     storageRef.child("Meetings/Done/" + meetingName).getDownloadURL()
         .then(function (url) {
             var xhr = new XMLHttpRequest();
@@ -120,19 +127,73 @@ if (UD === "D") {
                         div.appendChild(btn);
 
                         btn.onclick = function () {
-                            console.log(input.value);
+                            var loadTxt = document.createElement("h4");
+                            loadTxt.innerHTML = "יוצר את הפגישה... נא לא לצאת מהמסך!";
+                            document.body.appendChild(loadTxt);
+
                             var arr = t.split("&&");
                             var txt = arr[0] + "&&" + arr[1] + "&&" + arr[2] + "&&" + arr[3] + "&&"
                                 + input.value + "&&" + arr[5] + "&&";
                             var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
-                            storageRef.child('Meetings/Done/' + meetingName).put(blob);
-                            titleTxt.innerHTML = "המשוב הוזן בהצלחה!"
-                            subTxt.style.display = "none";
-                            input.style.display = "none";
-                            btn.style.display = "none";
+                            storageRef.child('Meetings/Finished/' + meetingName).put(blob)
+                                .then(function () {
+                                    storageRef.child("Meetings/Done/" + meetingName).delete()
+                                        .then(function () {
+                                            titleTxt.innerHTML = "המשוב הוזן בהצלחה!"
+                                            subTxt.style.display = "none";
+                                            input.style.display = "none";
+                                            btn.style.display = "none";
+                                            loadTxt.style.display = "none";
+                                        });
+                                });
                         }
                     }
                     if (type === "teacher") {
+                        let txt = document.createElement("h3");
+                        txt.innerHTML = "הפגישה נעשתה";
+
+                        div.appendChild(document.createTextNode(t.split("&&")[2] + " - " + t.split("&&")[3]));
+                        div.appendChild(document.createElement("br"));
+                        div.appendChild(txt);
+                    }
+                    if (type === "admin") {
+                        let txtS = document.createElement("h3");
+                        txtS.innerHTML = "משוב תלמיד";
+                        txtS.style.margin = 0;
+
+                        let txtT = document.createElement("h3");
+                        txtT.innerHTML = "משוב מורה";
+                        txtT.style.margin = 0;
+
+                        div.appendChild(document.createTextNode(t.split("&&")[2] + " - " + t.split("&&")[3]));
+                        div.appendChild(document.createElement("br"));
+                        div.appendChild(document.createElement("br"));
+                        div.appendChild(txtS);
+                        div.appendChild(document.createTextNode("עוד לא הוזן משוב תלמיד."));
+                        div.appendChild(document.createElement("br"));
+                        div.appendChild(document.createElement("br"));
+                        div.appendChild(txtT);
+                        div.appendChild(document.createTextNode(t.split("&&")[5]));
+                    }
+                })
+            };
+            xhr.open('GET', url);
+            xhr.send();
+        })
+        .catch(function (error) {
+            // Handle any errors
+            console.log(error);
+        });
+}
+if (UDF === "F") {
+    storageRef.child("Meetings/Finished/" + meetingName).getDownloadURL()
+        .then(function (url) {
+            var xhr = new XMLHttpRequest();
+            xhr.responseType = 'blob';
+            xhr.onload = function (event) {
+                var blob = xhr.response;
+                blob.text().then(t => {
+                    if (type === "student" || type === "teacher") {
                         let txt = document.createElement("h3");
                         txt.innerHTML = "הפגישה נעשתה";
 

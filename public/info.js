@@ -19,13 +19,13 @@ var storageRef = storage.ref();
 const title = document.getElementById("title");
 const tableUpcoming = document.getElementById("tableUpcoming");
 const tableDone = document.getElementById("tableDone");
+const tableFinished = document.getElementById("tableFinished");
 
 const name = sessionStorage.getItem("NAME");
 const type = sessionStorage.getItem("TYPE");
 const of = sessionStorage.getItem("OF");
 const num = parseInt(sessionStorage.getItem("NUM"));
 const className = sessionStorage.getItem("CLASS");
-console.log(name, type, of, num);
 
 title.innerHTML = of;
 
@@ -67,7 +67,7 @@ storageRef.child("Meetings/Upcoming").listAll()
                 row.insertCell().appendChild(txtName);
                 row.onclick = function () {
                     sessionStorage.setItem("MEETING", itemRef.name);
-                    sessionStorage.setItem("U/D", "U");
+                    sessionStorage.setItem("U/D/F", "U");
                     location.href = "meeting.html";
                 };
                 if (itemRef.name.includes(name)) {
@@ -95,7 +95,35 @@ storageRef.child("Meetings/Done").listAll()
                 row.insertCell().appendChild(txtName);
                 row.onclick = function () {
                     sessionStorage.setItem("MEETING", itemRef.name);
-                    sessionStorage.setItem("U/D", "D");
+                    sessionStorage.setItem("U/D/F", "D");
+                    location.href = "meeting.html";
+                };
+                if (itemRef.name.includes(name)) {
+                    btn.style.display = "none";
+                }
+            }
+        });
+    })
+    .catch(function (error) {
+        // Uh-oh, an error occurred!
+        console.log(error);
+    });
+
+storageRef.child("Meetings/Finished").listAll()
+    .then(function (res) {
+        res.prefixes.forEach(function (folderRef) {
+            // All the prefixes under listRef.
+            // You may call listAll() recursively on them.
+        });
+        res.items.forEach(function (itemRef) {
+            // All the items under listRef.
+            if (itemRef.name.includes(of)) {
+                txtName = document.createTextNode(itemRef.name.split(".")[0].replace("&", " - "));
+                var row = tableFinished.insertRow();
+                row.insertCell().appendChild(txtName);
+                row.onclick = function () {
+                    sessionStorage.setItem("MEETING", itemRef.name);
+                    sessionStorage.setItem("U/D/F", "F");
                     location.href = "meeting.html";
                 };
                 if (itemRef.name.includes(name)) {
@@ -132,11 +160,9 @@ function newMeeting(student, teacher, storageRef, btn, className) {
             var txt = student + "&&" + teacher + "&&" + input.value.split("T")[0].split("-")[2] +
                 "/" + input.value.split("T")[0].split("-")[1] + "/" + input.value.split("T")[0].split("-")[0] +
                 "&&" + input.value.split("T")[1] + "&&&&&&";
-            console.log(txt);
             var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
             storageRef.child('Meetings/Upcoming/' + student + "&" + teacher + ".txt").put(blob)
                 .then(function (snapshot) {
-                    console.log('Uploaded a blob or file! ' + student + "&" + teacher);
                     // TODO send an email
                     updateMeetings(storageRef, className, inputTxt, input, btnSub, btn, loadTxt);
                 });
@@ -169,8 +195,8 @@ function updateMeetings(storageRef, className, inputTxt, input, btnSub, btn, loa
                                             var num = 0;
 
                                             storageRef.child("Meetings").listAll()
-                                                .then(function (res) {
-                                                    res.prefixes.forEach(function (folderRef) {
+                                                .then(function (resF) {
+                                                    resF.prefixes.forEach(function (folderRef) {
                                                         // All the prefixes under listRef.
                                                         // You may call listAll() recursively on them.
                                                         folderRef.listAll()
@@ -181,13 +207,12 @@ function updateMeetings(storageRef, className, inputTxt, input, btnSub, btn, loa
                                                                         num++;
                                                                     }
                                                                 });
-                                                                if (folderRef.name === "Upcoming") {
+                                                                if (folderRef.name === resF.prefixes[2].name) {
                                                                     classTxt = classTxt.concat(sName + "==" + num + "&&");
                                                                     if (classTxt.length === t.length) {
                                                                         var blob = new Blob([classTxt], { type: "text/plain;charset=utf-8" });
                                                                         storageRef.child(classRef.fullPath).put(blob)
                                                                             .then(function (snapshot) {
-                                                                                console.log('Uploaded a blob or file! ' + classRef.name);
                                                                                 n++;
                                                                                 if (n == 2) {
                                                                                     inputTxt.innerHTML = "הפגישה נקבעה בהצלחה!";

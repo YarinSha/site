@@ -50,8 +50,6 @@ else {
 
     docRef.get().then(function (doc) {
         if (doc.exists) {
-            console.log("Document data:", doc.data());
-
             name = doc.data().name;
             type = doc.data().type;
 
@@ -92,5 +90,6 @@ btnClasses.addEventListener("click", e => {
 });
 
 btnTeachers.addEventListener("click", e => {
-    location.href = "teachers.html";
+    sessionStorage.setItem("CLASS", "מורים");
+    location.href = "class.html";
 });

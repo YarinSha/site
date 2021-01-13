@@ -14,8 +14,9 @@ firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 var storage = firebase.storage();
 var storageRef = storage.ref();
-//var db = firebase.firestore();
+var db = firebase.firestore();
 
+const pageTitle = document.getElementById("pageTitle");
 const title = document.getElementById("title");
 const tableUpcoming = document.getElementById("tableUpcoming");
 const tableDone = document.getElementById("tableDone");
@@ -27,9 +28,9 @@ const of = sessionStorage.getItem("OF");
 const num = parseInt(sessionStorage.getItem("NUM"));
 const className = sessionStorage.getItem("CLASS");
 
+pageTitle.innerHTML = of;
 title.innerHTML = of;
 
-/*
 var email = "";
 db.collection("users").where("name", "==", of).get()
     .then(function (querySnapshot) {
@@ -42,7 +43,6 @@ db.collection("users").where("name", "==", of).get()
     .catch(function (error) {
         console.log("Error getting documents: ", error);
     });
-*/
 
 if (type === "teacher" && num < 2) {
     var btn = document.createElement("button");
@@ -163,8 +163,10 @@ function newMeeting(student, teacher, storageRef, btn, className) {
             var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
             storageRef.child('Meetings/Upcoming/' + student + "&" + teacher + ".txt").put(blob)
                 .then(function (snapshot) {
-                    // TODO send an email
-                    updateMeetings(storageRef, className, inputTxt, input, btnSub, btn, loadTxt);
+                    storageRef.child("Emails/" + email + ".txt").put(blob)
+                        .then(function (snapshot) {
+                            updateMeetings(storageRef, className, inputTxt, input, btnSub, btn, loadTxt);
+                        });
                 });
         }
         else {

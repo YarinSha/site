@@ -48,7 +48,7 @@ if (type === "teacher" && num < 2) {
     var btn = document.createElement("button");
     btn.innerHTML = "קביעת פגישה";
     btn.onclick = function () {
-        newMeeting(of, name, storageRef, btn, className);
+        newMeeting(of, name, storageRef, btn, className, email);
     };
     setTimeout(() => { document.body.appendChild(btn) }, 2000);
 }
@@ -137,7 +137,7 @@ storageRef.child("Meetings/Finished").listAll()
         console.log(error);
     });
 
-function newMeeting(student, teacher, storageRef, btn, className) {
+function newMeeting(student, teacher, storageRef, btn, className, email) {
     var inputTxt = document.createElement("h4");
     inputTxt.innerHTML = "זמן הפגישה:";
     document.body.appendChild(inputTxt);
@@ -211,7 +211,7 @@ function updateMeetings(storageRef, className, inputTxt, input, btnSub, btn, loa
                                                                 });
                                                                 if (folderRef.name === resF.prefixes[2].name) {
                                                                     classTxt = classTxt.concat(sName + "==" + num + "&&");
-                                                                    if (classTxt.length === t.length) {
+                                                                    if (classTxt.split("&&").length === t.split("&&").length) {
                                                                         var blob = new Blob([classTxt], { type: "text/plain;charset=utf-8" });
                                                                         storageRef.child(classRef.fullPath).put(blob)
                                                                             .then(function (snapshot) {

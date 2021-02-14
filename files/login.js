@@ -21,6 +21,7 @@ const btnForget = document.getElementById("btnForget");
 const inputTxt = document.getElementById("inputTxt");
 const input = document.getElementById("input");
 const btnSub = document.getElementById("btnSub");
+const loadTxt = document.getElementById("loadTxt");
 
 inputTxt.style.display = "none";
 input.style.display = "none";
@@ -31,9 +32,7 @@ btnNext.addEventListener("click", e => {
     inputTxt.style.display = "none";
     input.style.display = "none";
     btnSub.style.display = "none";
-    var loadTxt = document.createElement("h4");
     loadTxt.innerHTML = "מתחבר...";
-    document.body.appendChild(loadTxt);
     // Get email and password
     const email = userEmail.value;
     const password = userPassword.value;

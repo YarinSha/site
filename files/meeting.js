@@ -14,6 +14,7 @@ firebase.initializeApp(firebaseConfig);
 firebase.analytics();
 var storage = firebase.storage();
 var storageRef = storage.ref();
+var db = firebase.firestore();
 
 const title = document.getElementById("title");
 const div = document.getElementById("div");
@@ -23,6 +24,18 @@ const type = sessionStorage.getItem("TYPE");
 
 const meetingName = sessionStorage.getItem("MEETING");
 const UDF = sessionStorage.getItem("U/D/F");
+
+var email = "";
+db.collection("users").where("name", "==", meetingName.split(".")[0].split("&")[0]).get()
+    .then(function (querySnapshot) {
+        querySnapshot.forEach(function (doc) {
+            // doc.data() is never undefined for query doc snapshots
+            email = doc.id;
+        });
+    })
+    .catch(function (error) {
+        console.log("Error getting documents: ", error);
+    });
 
 title.innerHTML = meetingName.split(".")[0].replace("&", " - ");
 
@@ -76,10 +89,13 @@ if (UDF === "U") {
                                 .then(function () {
                                     storageRef.child("Meetings/Upcoming/" + meetingName).delete()
                                         .then(function () {
-                                            titleTxt.innerHTML = "המשוב הוזן בהצלחה!"
-                                            input.style.display = "none";
-                                            btn.style.display = "none";
-                                            loadTxt.style.display = "none";
+                                            storageRef.child('Emails/' + email + ".txt").put(blob)
+                                                .then(function () {
+                                                    titleTxt.innerHTML = "המשוב הוזן בהצלחה!"
+                                                    input.style.display = "none";
+                                                    btn.style.display = "none";
+                                                    loadTxt.style.display = "none";
+                                                });
                                         });
                                 });
                         }

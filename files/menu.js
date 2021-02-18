@@ -39,6 +39,17 @@ btnPass.innerHTML = "שינוי סיסמה";
 btnPass.style.margin = "10px auto";
 document.body.appendChild(btnPass);
 
+var inputTxtOld = document.createElement("h4");
+inputTxtOld.innerHTML = "סיסמה ישנה:";
+inputTxtOld.style.display = "none";
+document.body.appendChild(inputTxtOld);
+
+var inputOld = document.createElement("input");
+inputOld.type = "password";
+inputOld.style.display = "none";
+inputOld.style.margin = "10px auto";
+document.body.appendChild(inputOld);
+
 var inputTxt = document.createElement("h4");
 inputTxt.innerHTML = "סיסמה חדשה:";
 inputTxt.style.display = "none";
@@ -49,6 +60,17 @@ input.type = "password";
 input.style.display = "none";
 input.style.margin = "10px auto";
 document.body.appendChild(input);
+
+var inputTxt2 = document.createElement("h4");
+inputTxt2.innerHTML = "סיסמה חדשה שוב:";
+inputTxt2.style.display = "none";
+document.body.appendChild(inputTxt2);
+
+var input2 = document.createElement("input");
+input2.type = "password";
+input2.style.display = "none";
+input2.style.margin = "10px auto";
+document.body.appendChild(input2);
 
 var btnSub = document.createElement("button");
 btnSub.innerHTML = "שינוי";
@@ -115,37 +137,55 @@ else {
 }
 
 btnMeetings.addEventListener("click", e => {
-    if (!(type === "student")) {
-        location.href = "meetings.html";
-    }
+    location.href = "meetings.html";
 });
 
 btnClasses.addEventListener("click", e => {
-    if (type === "admin") {
+    if (!(type === "student")) {
         location.href = "classes.html";
     }
 });
 
 btnTeachers.addEventListener("click", e => {
-    sessionStorage.setItem("CLASS", "מורים");
-    location.href = "class.html";
+    if (type === "admin") {
+        sessionStorage.setItem("CLASS", "מורים");
+        location.href = "class.html";
+    }
 });
 
 btnPass.onclick = function () {
-    inputTxt.innerHTML = "סיסמה חדשה:";
+    inputTxtOld.style.display = "block";
+    inputOld.style.display = "block";
     inputTxt.style.display = "block";
     input.style.display = "block";
+    inputTxt2.style.display = "block";
+    input2.style.display = "block";
     btnSub.style.display = "block";
 
     btnSub.onclick = function () {
         var user = firebase.auth().currentUser;
         var newPassword = input.value;
+        var credential = firebase.auth.EmailAuthProvider.credential(user.email, inputOld.value);
 
-        user.updatePassword(newPassword).then(function () {
-            // Update successful.
-            inputTxt.innerHTML = "הסיסמה שונתה בהצלחה!"
-            input.style.display = "none";
-            btnSub.style.display = "none";
+        user.reauthenticateWithCredential(credential).then(function () {
+            // User re-authenticated.
+            if (newPassword === input2.value) {
+                user.updatePassword(newPassword).then(function () {
+                    // Update successful.
+                    inputTxt.innerHTML = "הסיסמה שונתה בהצלחה!"
+                    input.style.display = "none";
+                    btnSub.style.display = "none";
+                    inputTxtOld.style.display = "none";
+                    inputOld.style.display = "none";
+                    inputTxt2.style.display = "none";
+                    input2.style.display = "none";
+                }).catch(function (error) {
+                    // An error happened.
+                    alert(error.message);
+                });
+            } else {
+                alert("הסיסמאות החדשות לא תואמות!");
+            }
         }).catch(function (error) {
             // An error happened.
             alert(error.message);

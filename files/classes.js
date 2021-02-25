@@ -12,37 +12,25 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
-var storage = firebase.storage();
-var storageRef = storage.ref();
+var database = firebase.database();
 
 const table = document.getElementById("table");
 
 const name = sessionStorage.getItem("NAME");
 const type = sessionStorage.getItem("TYPE");
 
-storageRef.child("Classes").listAll()
-    .then(function (res) {
-        res.prefixes.forEach(function (folderRef) {
-            // All the prefixes under listRef.
-            // You may call listAll() recursively on them.
-        });
-        res.items.forEach(function (itemRef) {
-            // All the items under listRef.
-            if (itemRef.name !== "Teachers.txt") {
-                let txtName = document.createTextNode(itemRef.name.split(".")[0]);
-                var row = table.insertRow();
-                row.insertCell().appendChild(txtName);
-                row.onclick = function () {
-                    sessionStorage.setItem("CLASS", itemRef.name.split(".")[0]);
-                    location.href = "class.html";
-                };
-            }
-        });
-    })
-    .catch(function (error) {
-        // Uh-oh, an error occurred!
-        console.log(error);
+database.ref("כיתות").once('value').then((snapshot) => {
+    var arr = snapshot.val();
+    arr.forEach(element => {
+        let txtName = document.createTextNode(element);
+        var row = table.insertRow();
+        row.insertCell().appendChild(txtName);
+        row.onclick = function () {
+            sessionStorage.setItem("CLASS", element);
+            location.href = "class.html";
+        };
     });
+});
 
 window.addEventListener('storage', function (e) {
     if (e.storageArea === sessionStorage) {

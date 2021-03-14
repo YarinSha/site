@@ -61,6 +61,15 @@ storageRef.child("Meetings/Upcoming").listAll()
                 row.onclick = function () {
                     sessionStorage.setItem("MEETING", itemRef.name);
                     sessionStorage.setItem("U/D/F", "U");
+                    if (tableUpcoming.rows.length == 3) {
+                        var rIndex = row.rowIndex;
+                        if (rIndex == 1) {
+                            sessionStorage.setItem("otherMeet", tableUpcoming.rows[2].cells[0].innerHTML.replace(" - ", "&") + ".txt")
+                        }
+                        if (rIndex == 2) {
+                            sessionStorage.setItem("otherMeet", tableUpcoming.rows[1].cells[0].innerHTML.replace(" - ", "&") + ".txt")
+                        }
+                    }
                     location.href = "meeting.html";
                 };
                 if (itemRef.name.includes(name)) {
@@ -104,7 +113,7 @@ storageRef.child("Meetings/Upcoming").listAll()
                                 }
                             }
                         });
-                        if (type === "teacher" && num < 2) {
+                        if (!(className === "מורים") && num < 2) {
                             document.body.appendChild(btn);
                         }
                     })
@@ -132,6 +141,31 @@ window.addEventListener('storage', function (e) {
 });
 
 function newMeeting(student, teacher, storageRef, btn, className, email) {
+    var date;
+    if (tableUpcoming.rows.length == 2) {
+        var ref = storageRef.child("Meetings/Upcoming/" + tableUpcoming.rows[1].cells[0].innerHTML.replace(" - ", "&") + ".txt");
+
+        ref.getDownloadURL()
+            .then(function (url) {
+                var xhr = new XMLHttpRequest();
+                xhr.responseType = 'blob';
+                xhr.onload = function (event) {
+                    var blob = xhr.response;
+                    blob.text().then(t => {
+                        var d = t.split("&&")[2];
+                        var ti = t.split("&&")[3];
+                        date = new Date(d.split("/")[2] + "-" + d.split("/")[1] + "-" + d.split("/")[0] + "T" + ti);
+                    })
+                };
+                xhr.open('GET', url);
+                xhr.send();
+            })
+            .catch(function (error) {
+                // Handle any errors
+                console.log(error);
+            });
+    }
+
     var inputTxt = document.createElement("h4");
     inputTxt.innerHTML = "זמן הפגישה:";
     document.body.appendChild(inputTxt);
@@ -151,19 +185,47 @@ function newMeeting(student, teacher, storageRef, btn, className, email) {
             loadTxt.innerHTML = "יוצר את הפגישה... נא לא לצאת מהמסך!";
             document.body.appendChild(loadTxt);
 
-            var txt = student + "&&" + teacher + "&&" + input.value.split("T")[0].split("-")[2] +
-                "/" + input.value.split("T")[0].split("-")[1] + "/" + input.value.split("T")[0].split("-")[0] +
-                "&&" + input.value.split("T")[1] + "&&&&&&";
-            var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
-            storageRef.child('Meetings/Upcoming/' + student + "&" + teacher + ".txt").put(blob)
-                .then(function (snapshot) {
-                    storageRef.child("Emails/" + email + ".txt").put(blob)
+            if (tableUpcoming.rows.length == 2) {
+                var newDate = new Date(input.value);
+                var diff = Math.abs(date - newDate) / (1000 * 60);
+                console.log(diff);
+                if (diff < 30) {
+                    alert("זמן זה תפוס, אנא בחר/י זמן אחר");
+                } else {
+                    var txt = student + "&&" + teacher + "&&" + input.value.split("T")[0].split("-")[2] +
+                        "/" + input.value.split("T")[0].split("-")[1] + "/" + input.value.split("T")[0].split("-")[0] +
+                        "&&" + input.value.split("T")[1] + "&&&&&&";
+                    var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+                    storageRef.child('Meetings/Upcoming/' + student + "&" + teacher + ".txt").put(blob)
                         .then(function (snapshot) {
-                            updateMeetings(className, student, inputTxt, input, btnSub, btn, loadTxt);
+                            if (email.includes("@")) {
+                            storageRef.child("Emails/" + email + ".txt").put(blob)
+                                .then(function (snapshot) {
+                                    updateMeetings(className, student, inputTxt, input, btnSub, btn, loadTxt);
+                                });
+                            } else {
+                                updateMeetings(className, student, inputTxt, input, btnSub, btn, loadTxt);
+                            }
                         });
-                });
-        }
-        else {
+                }
+            } else {
+                var txt = student + "&&" + teacher + "&&" + input.value.split("T")[0].split("-")[2] +
+                    "/" + input.value.split("T")[0].split("-")[1] + "/" + input.value.split("T")[0].split("-")[0] +
+                    "&&" + input.value.split("T")[1] + "&&&&&&";
+                var blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+                storageRef.child('Meetings/Upcoming/' + student + "&" + teacher + ".txt").put(blob)
+                    .then(function (snapshot) {
+                        if (email.includes("@")) {
+                            storageRef.child("Emails/" + email + ".txt").put(blob)
+                                .then(function (snapshot) {
+                                    updateMeetings(className, student, inputTxt, input, btnSub, btn, loadTxt);
+                                });
+                        } else {
+                            updateMeetings(className, student, inputTxt, input, btnSub, btn, loadTxt);
+                        }
+                    });
+            }
+        } else {
             alert("לא בחרת זמן לפגישה!");
         }
     };

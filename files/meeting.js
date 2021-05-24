@@ -142,6 +142,38 @@ if (UDF === "U") {
                                         // Handle any errors
                                         console.log(error);
                                     });
+                            } else {
+                                storageRef.child("Meetings/Upcoming").listAll()
+                                    .then(function (res) {
+                                        res.items.forEach(function (itemRef) {
+                                            // All the items under listRef.
+                                            if (itemRef.name.includes(student) && !itemRef.name.includes(teacher)) {
+                                                itemRef.getDownloadURL()
+                                                    .then(function (url) {
+                                                        var xhr = new XMLHttpRequest();
+                                                        xhr.responseType = 'blob';
+                                                        xhr.onload = function (event) {
+                                                            var blob = xhr.response;
+                                                            blob.text().then(t => {
+                                                                var d = t.split("&&")[2];
+                                                                var ti = t.split("&&")[3];
+                                                                date = new Date(d.split("/")[2] + "-" + d.split("/")[1] + "-" + d.split("/")[0] + "T" + ti);
+                                                            })
+                                                        };
+                                                        xhr.open('GET', url);
+                                                        xhr.send();
+                                                    })
+                                                    .catch(function (error) {
+                                                        // Handle any errors
+                                                        console.log(error);
+                                                    });
+                                            }
+                                        });
+                                    })
+                                    .catch(function (error) {
+                                        // Uh-oh, an error occurred!
+                                        console.log(error);
+                                    });
                             }
 
                             var inputTxt = document.createElement("h4");
@@ -159,17 +191,17 @@ if (UDF === "U") {
                             btnSub.innerHTML = "שינוי";
                             btnSub.onclick = function () {
                                 if (input.value) {
-                                    var loadTxt = document.createElement("h4");
-                                    loadTxt.innerHTML = "משנה את הפגישה... נא לא לצאת מהמסך!";
-                                    document.body.appendChild(loadTxt);
-
-                                    if (otherMeet && (otherMeet.split("&")[0] === meetingName.split("&")[0])) {
+                                    if (date) {
                                         var newDate = new Date(input.value);
                                         var diff = Math.abs(date - newDate) / (1000 * 60);
                                         console.log(diff);
-                                        if (diff < 30) {
+                                        if (diff < 20) {
                                             alert("זמן זה תפוס, אנא בחר/י זמן אחר");
                                         } else {
+                                            var loadTxt = document.createElement("h4");
+                                            loadTxt.innerHTML = "משנה את הפגישה... נא לא לצאת מהמסך!";
+                                            document.body.appendChild(loadTxt);
+
                                             var txt = student + "&&" + teacher + "&&" + input.value.split("T")[0].split("-")[2] +
                                                 "/" + input.value.split("T")[0].split("-")[1] + "/" + input.value.split("T")[0].split("-")[0] +
                                                 "&&" + input.value.split("T")[1] + "&&&&&&";
@@ -193,6 +225,10 @@ if (UDF === "U") {
                                                 });
                                         }
                                     } else {
+                                        var loadTxt = document.createElement("h4");
+                                        loadTxt.innerHTML = "משנה את הפגישה... נא לא לצאת מהמסך!";
+                                        document.body.appendChild(loadTxt);
+
                                         var txt = student + "&&" + teacher + "&&" + input.value.split("T")[0].split("-")[2] +
                                             "/" + input.value.split("T")[0].split("-")[1] + "/" + input.value.split("T")[0].split("-")[0] +
                                             "&&" + input.value.split("T")[1] + "&&&&&&";

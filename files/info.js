@@ -181,17 +181,17 @@ function newMeeting(student, teacher, storageRef, btn, className, email) {
     btnSub.innerHTML = "קביעה";
     btnSub.onclick = function () {
         if (input.value) {
-            var loadTxt = document.createElement("h4");
-            loadTxt.innerHTML = "יוצר את הפגישה... נא לא לצאת מהמסך!";
-            document.body.appendChild(loadTxt);
-
             if (tableUpcoming.rows.length == 2) {
                 var newDate = new Date(input.value);
                 var diff = Math.abs(date - newDate) / (1000 * 60);
                 console.log(diff);
-                if (diff < 30) {
+                if (diff < 20) {
                     alert("זמן זה תפוס, אנא בחר/י זמן אחר");
                 } else {
+                    var loadTxt = document.createElement("h4");
+                    loadTxt.innerHTML = "יוצר את הפגישה... נא לא לצאת מהמסך!";
+                    document.body.appendChild(loadTxt);
+
                     var txt = student + "&&" + teacher + "&&" + input.value.split("T")[0].split("-")[2] +
                         "/" + input.value.split("T")[0].split("-")[1] + "/" + input.value.split("T")[0].split("-")[0] +
                         "&&" + input.value.split("T")[1] + "&&&&&&";
@@ -199,16 +199,20 @@ function newMeeting(student, teacher, storageRef, btn, className, email) {
                     storageRef.child('Meetings/Upcoming/' + student + "&" + teacher + ".txt").put(blob)
                         .then(function (snapshot) {
                             if (email.includes("@")) {
-                            storageRef.child("Emails/" + email + ".txt").put(blob)
-                                .then(function (snapshot) {
-                                    updateMeetings(className, student, inputTxt, input, btnSub, btn, loadTxt);
-                                });
+                                storageRef.child("Emails/" + email + ".txt").put(blob)
+                                    .then(function (snapshot) {
+                                        updateMeetings(className, student, inputTxt, input, btnSub, btn, loadTxt);
+                                    });
                             } else {
                                 updateMeetings(className, student, inputTxt, input, btnSub, btn, loadTxt);
                             }
                         });
                 }
             } else {
+                var loadTxt = document.createElement("h4");
+                loadTxt.innerHTML = "יוצר את הפגישה... נא לא לצאת מהמסך!";
+                document.body.appendChild(loadTxt);
+
                 var txt = student + "&&" + teacher + "&&" + input.value.split("T")[0].split("-")[2] +
                     "/" + input.value.split("T")[0].split("-")[1] + "/" + input.value.split("T")[0].split("-")[0] +
                     "&&" + input.value.split("T")[1] + "&&&&&&";
